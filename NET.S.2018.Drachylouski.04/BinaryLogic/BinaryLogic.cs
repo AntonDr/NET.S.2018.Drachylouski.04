@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,103 +9,54 @@ namespace BinaryLogic
 {
     public static class BinaryLogic
     {
-        public static string ToBinaryString(this double number)
+        private const int NumberOfIEE754 = 64;
+
+        /// <summary>
+        /// Obtaining a string representation of a real number in the format IEEE 754
+        /// </summary>
+        /// <param name="number">Source number</param>
+        /// <returns>String of bit</returns>
+        public static string DoubleToStringOfBit(this double number)
         {
+            var @struct = new LongAndDoubleRepresentation(number);
+            long @long = (long)@struct;
 
-
-
-            const int @base = 2;
-
-            const int theRemainderOfTheMantissa = 52;
-
-
-            string first = null;
-
-            first = number < 0 ? "1" : "0";
-
-            var temp = Math.Abs(Math.Truncate(number));
-
-            double x = Math.Abs(number) - temp;
-
-            var mantissa = new StringBuilder();
-
-            int k = 0;
-
-            while (temp != 0)
-            {
-                mantissa.Append(temp % @base);
-                k++;
-                temp = Math.Truncate(temp/@base);
-            }
-
-            string exponent = FindExponent(k);
-
-            mantissa.Reverse();
-
-           
-
-            bool flag = true;
-
-            for (int j = 0; j <= theRemainderOfTheMantissa-k; j++)
-            {
-                int product = (int)(x * @base);
-                x = x * @base - product;
-                mantissa.Append(product);
-
-                if (product == 1)
-                {
-                    flag = false;
-                }
-
-            }
-
-            if (mantissa.Length > 0)
-            {
-                mantissa.Remove(0, 1);
-            }
-
-            if (flag && String.Equals("00000000000",exponent))
-            {
-                mantissa[mantissa.Length - 1] = '1';
-            }
-
-           
-
-            if (theRemainderOfTheMantissa!=mantissa.Length-1)
-            {
-                mantissa.Remove(theRemainderOfTheMantissa, mantissa.Length-theRemainderOfTheMantissa);
-            }
-           
-
-            return first + exponent + mantissa.ToString();
+            return @long.LongToStringOfBit();
         }
 
-        private static string FindExponent(int k)
+        /// <summary>
+        /// Structure for getting a long representation through a double
+        /// </summary>
+        [StructLayout(LayoutKind.Explicit)]
+        private struct LongAndDoubleRepresentation
         {
-            const int x = 1023;
+            [FieldOffset(0)] private readonly double doubleRepresentation;
 
-            const int @base = 2;
+            [FieldOffset(0)] private readonly long longRepresenatiotion;
 
-            if (k != 0)
+            public LongAndDoubleRepresentation(double value) : this()
             {
-                k--;
-                k += x;
-
-
-                var exponent = new StringBuilder();
-
-                while (k != 0)
-                {
-                    exponent.Append((k % @base));
-                    k /= @base;
-                }
-
-                exponent.Reverse();
-
-
-                return exponent.ToString();
+                doubleRepresentation = value;
             }
-            else return "00000000000";
+
+            public static explicit operator long(LongAndDoubleRepresentation @struct)
+            {
+                return @struct.longRepresenatiotion;
+            }
+        }
+
+        private static string LongToStringOfBit(this long value)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 0; i < NumberOfIEE754; i++, value >>= 1)
+            {
+                sb.Append(value & 1);
+            }
+
+            sb.Reverse();
+
+            return sb.ToString();
         }
 
         private static void Reverse(this StringBuilder sb)
