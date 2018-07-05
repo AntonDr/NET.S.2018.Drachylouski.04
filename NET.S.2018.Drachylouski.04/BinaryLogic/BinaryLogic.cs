@@ -34,9 +34,9 @@ namespace BinaryLogic
 
             [FieldOffset(0)] private readonly long longRepresenatiotion;
 
-            public LongAndDoubleRepresentation(double value) : this()
+            public LongAndDoubleRepresentation(double number) : this()
             {
-                doubleRepresentation = value;
+                doubleRepresentation = number;
             }
 
             public static explicit operator long(LongAndDoubleRepresentation @struct)
@@ -45,13 +45,13 @@ namespace BinaryLogic
             }
         }
 
-        private static string LongToStringOfBit(this long value)
+        private static string LongToStringOfBit(this long number)
         {
             StringBuilder sb = new StringBuilder();
 
-            for (int i = 0; i < NumberOfIEE754; i++, value >>= 1)
+            for (int i = 0; i < NumberOfIEE754; i++, number >>= 1)
             {
-                sb.Append(value & 1);
+                sb.Append(number & 1);
             }
 
             sb.Reverse();
