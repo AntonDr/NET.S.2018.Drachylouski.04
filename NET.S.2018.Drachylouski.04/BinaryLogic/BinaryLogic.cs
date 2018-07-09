@@ -47,7 +47,7 @@ namespace BinaryLogic
 
         private static string LongToStringOfBit(this long number)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(NumberOfIEE754);
 
             for (int i = 0; i < NumberOfIEE754; i++, number >>= 1)
             {
